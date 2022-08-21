@@ -2,5 +2,8 @@
   "name": "amqp-manager",
   "version": "1.0.0",
   "main": "lib/index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "4.7.4"
+  }
 }
