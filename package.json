@@ -1,9 +1,9 @@
 {
-  "name": "amqp-manager",
+  "name": "amqp-rabbitmq-manager",
   "version": "1.0.0",
   "main": "lib/index.js",
   "author": "Pavlo Chmykh",
-  "repository": "https://github.com/DeepzUa/amqp-manager",
+  "repository": "https://github.com/DeepzUa/amqp-rabbitmq-manager",
   "license": "MIT",
   "private": false,
   "scripts": {
