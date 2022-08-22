@@ -2,7 +2,20 @@
   "name": "amqp-manager",
   "version": "1.0.0",
   "main": "lib/index.js",
+  "author": "Pavlo Chmykh",
+  "repository": "https://github.com/DeepzUa/amqp-manager",
   "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "amqplib",
+    "node",
+    "amqplib-manager",
+    "rabbitmq",
+    "rpc"
+  ],
   "devDependencies": {
     "@types/amqplib": "0.8.2",
     "@types/node": "18.7.9",
