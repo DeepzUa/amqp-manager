@@ -4,10 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { wait } from './helpers';
 
 export interface AmqpManagerConfig  {
-  user?: string,
   password?: string,
+  timeout?: number,
   url: string,
-  timeout?: number
+  user?: string,
 }
 
 export interface ChannelWithResponse extends Channel {
@@ -70,7 +70,7 @@ class AmqpManager {
     if (this.connect != null){
       this.connect.on('error',  async () => {
         this.connect = null;
-        this.onErrorCallback && this.onErrorCallback('Error connection to RabbitMQ');
+        this.onErrorCallback && this.onErrorCallback('RabbitMQ connection error');
         await this.initConnect(this.amqpConfig, true);
       });
     }else {
@@ -82,11 +82,11 @@ class AmqpManager {
     if (this.connect != null){
       this.connect.on('close',  async () => {
         this.connect = null;
-        this.onCloseCallback && this.onCloseCallback('Close connection to RabbitMQ');
+        this.onCloseCallback && this.onCloseCallback('Close RabbitMQ connection');
         await this.initConnect(this.amqpConfig, true);
       });
     }else {
-      throw new Error('Connecting is close');
+      throw new Error('Close connection');
     }
   }
 
