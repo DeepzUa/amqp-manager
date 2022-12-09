@@ -54,7 +54,7 @@ class AmqpManager {
       console.log(`connected to ${amqpConfig.url}`);
       await this.restoreConsumes();
     } catch (e: any) {
-      console.log(`Error connect to ${amqpConfig.url}, ${e.message}`);
+      console.error(`Error connect to ${amqpConfig.url}, ${e.message}`);
       this.initConnect(amqpConfig, true);
     }
   }
@@ -91,11 +91,15 @@ class AmqpManager {
   }
 
   private async queueSubscribe(channel: ChannelWithResponse): Promise<string> {
-      const q = await channel.assertQueue('', { exclusive: true });
-      channel.responseEmitter = new EventEmitter();
-      channel.responseEmitter.setMaxListeners(0);
-      channel.consume(q.queue, (msg: ConsumeMessage | null) => channel.responseEmitter.emit(msg?.properties.correlationId, msg), { noAck: true });
-      return q.queue;
+    const q = await channel.assertQueue('', { exclusive: true });
+    channel.responseEmitter = new EventEmitter();
+    channel.responseEmitter.setMaxListeners(0);
+    channel.consume(q.queue, (msg: ConsumeMessage | null) => channel.responseEmitter.emit(msg?.properties.correlationId, msg), { noAck: true });
+    return q.queue;
+  }
+
+  public isConnected() {
+    return this.connect != null;
   }
 
   sendRPCMessageWithResponse(rpcQueue: string, message: any, timerError = 5000, opt?: Options.Publish): Promise<ConsumeMessage> {
