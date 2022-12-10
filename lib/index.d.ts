@@ -2,6 +2,7 @@
 import { Channel, ConsumeMessage, Options } from 'amqplib';
 import EventEmitter from 'events';
 export interface AmqpManagerConfig {
+    debugLogs?: boolean;
     password?: string;
     timeout?: number;
     url: string;
@@ -28,6 +29,7 @@ declare class AmqpManager {
     private onError;
     private onClose;
     private queueSubscribe;
+    isConnected(): boolean;
     sendRPCMessageWithResponse(rpcQueue: string, message: any, timerError?: number, opt?: Options.Publish): Promise<ConsumeMessage>;
     delConsume(rpcQueue: string): boolean;
     addConsume(consume: Consume, restore: boolean): Promise<void>;
