@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { wait } from './helpers';
 
 export interface AmqpManagerConfig  {
+  debugLogs?: boolean,
   password?: string,
   timeout?: number,
   url: string,
@@ -39,9 +40,9 @@ class AmqpManager {
     await this.initConnect(amqpConfig);
   }
 
-  private async initConnect(amqpConfig: AmqpManagerConfig, waitToTry?: boolean){
+  private async initConnect(amqpConfig: AmqpManagerConfig, waitToTry?: boolean): Promise<void> {
     waitToTry && await wait(5000).promise;
-    console.log(`try to connect ${amqpConfig.url}`);
+    amqpConfig.debugLogs && console.log(`try to connect ${amqpConfig.url}`);
     const opt = {
       credentials: (amqpConfig.user && amqpConfig.password)
         && amqplib.credentials.plain(amqpConfig.user, amqpConfig.password),
@@ -51,22 +52,23 @@ class AmqpManager {
       this.connect = await amqplib.connect(amqpConfig.url, opt);
       this.onClose();
       this.onError();
-      console.log(`connected to ${amqpConfig.url}`);
+      amqpConfig.debugLogs && console.log(`connected to ${amqpConfig.url}`);
       await this.restoreConsumes();
     } catch (e: any) {
-      console.log(`Error connect to ${amqpConfig.url}, ${e.message}`);
+      amqpConfig.debugLogs && console.error(`Error connect to ${amqpConfig.url}, ${e.message}`);
+      this.onErrorCallback && this.onErrorCallback('RabbitMQ connection error');
       this.initConnect(amqpConfig, true);
     }
   }
 
-  private async restoreConsumes() {
+  private async restoreConsumes(): Promise<void> {
     for (const key of this.listConsumes.keys()) {
       const consumer: Consume | undefined =  this.listConsumes.get(key);
       consumer && await this.addConsume(consumer, true);
     }
   }
 
-  private onError(){
+  private onError(): void {
     if (this.connect != null){
       this.connect.on('error',  async () => {
         this.connect = null;
@@ -78,7 +80,7 @@ class AmqpManager {
     }
   }
 
-  private onClose(){
+  private onClose(): void {
     if (this.connect != null){
       this.connect.on('close',  async () => {
         this.connect = null;
@@ -91,11 +93,15 @@ class AmqpManager {
   }
 
   private async queueSubscribe(channel: ChannelWithResponse): Promise<string> {
-      const q = await channel.assertQueue('', { exclusive: true });
-      channel.responseEmitter = new EventEmitter();
-      channel.responseEmitter.setMaxListeners(0);
-      channel.consume(q.queue, (msg: ConsumeMessage | null) => channel.responseEmitter.emit(msg?.properties.correlationId, msg), { noAck: true });
-      return q.queue;
+    const q = await channel.assertQueue('', { exclusive: true });
+    channel.responseEmitter = new EventEmitter();
+    channel.responseEmitter.setMaxListeners(0);
+    channel.consume(q.queue, (msg: ConsumeMessage | null) => channel.responseEmitter.emit(msg?.properties.correlationId, msg), { noAck: true });
+    return q.queue;
+  }
+
+  public isConnected(): boolean {
+    return this.connect != null;
   }
 
   sendRPCMessageWithResponse(rpcQueue: string, message: any, timerError = 5000, opt?: Options.Publish): Promise<ConsumeMessage> {
