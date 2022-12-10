@@ -40,7 +40,7 @@ class AmqpManager {
     await this.initConnect(amqpConfig);
   }
 
-  private async initConnect(amqpConfig: AmqpManagerConfig, waitToTry?: boolean){
+  private async initConnect(amqpConfig: AmqpManagerConfig, waitToTry?: boolean): Promise<void> {
     waitToTry && await wait(5000).promise;
     amqpConfig.debugLogs && console.log(`try to connect ${amqpConfig.url}`);
     const opt = {
@@ -61,14 +61,14 @@ class AmqpManager {
     }
   }
 
-  private async restoreConsumes() {
+  private async restoreConsumes(): Promise<void> {
     for (const key of this.listConsumes.keys()) {
       const consumer: Consume | undefined =  this.listConsumes.get(key);
       consumer && await this.addConsume(consumer, true);
     }
   }
 
-  private onError(){
+  private onError(): void {
     if (this.connect != null){
       this.connect.on('error',  async () => {
         this.connect = null;
@@ -80,7 +80,7 @@ class AmqpManager {
     }
   }
 
-  private onClose(){
+  private onClose(): void {
     if (this.connect != null){
       this.connect.on('close',  async () => {
         this.connect = null;
@@ -100,7 +100,7 @@ class AmqpManager {
     return q.queue;
   }
 
-  public isConnected() {
+  public isConnected(): boolean {
     return this.connect != null;
   }
 
