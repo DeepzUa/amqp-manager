@@ -56,6 +56,7 @@ class AmqpManager {
       await this.restoreConsumes();
     } catch (e: any) {
       amqpConfig.debugLogs && console.error(`Error connect to ${amqpConfig.url}, ${e.message}`);
+      this.onErrorCallback && this.onErrorCallback('RabbitMQ connection error');
       this.initConnect(amqpConfig, true);
     }
   }
