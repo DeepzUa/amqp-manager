@@ -18,7 +18,7 @@ export interface ChannelWithResponse extends Channel {
 interface Consume {
   channel?: Channel,
   rpcQueue: string,
-  onMassage: (message: ConsumeMessage | null) => void,
+  onMessage: (message: ConsumeMessage | null) => void,
 }
 
 class AmqpManager {
@@ -153,7 +153,7 @@ class AmqpManager {
     if (channel) {
       consume.channel = channel;
       await channel.assertQueue(consume.rpcQueue, { durable: false });
-      await channel.consume(consume.rpcQueue, consume.onMassage, { noAck: true })
+      await channel.consume(consume.rpcQueue, consume.onMessage, { noAck: true })
     }
     this.listConsumes.get(consume.rpcQueue) == null && this.listConsumes.set(consume.rpcQueue, consume);
   }

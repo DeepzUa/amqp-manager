@@ -14,7 +14,7 @@ export interface ChannelWithResponse extends Channel {
 interface Consume {
     channel?: Channel;
     rpcQueue: string;
-    onMassage: (message: ConsumeMessage | null) => void;
+    onMessage: (message: ConsumeMessage | null) => void;
 }
 declare class AmqpManager {
     private connect;
