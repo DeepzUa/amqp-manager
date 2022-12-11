@@ -169,6 +169,10 @@ class AmqpManager {
     }
   }
 
+  public getAmqpLibInstance(): Connection | null {
+    return this.connect;
+  }
+
   private async getChannel(): Promise<Channel | null> {
     if (this.connect != null)
       return await this.connect.createChannel();
