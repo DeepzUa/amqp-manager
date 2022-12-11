@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { Channel, ConsumeMessage, Options } from 'amqplib';
+import { Channel, Connection, ConsumeMessage, Options } from 'amqplib';
 import EventEmitter from 'events';
 export interface AmqpManagerConfig {
     debugLogs?: boolean;
@@ -14,7 +14,7 @@ export interface ChannelWithResponse extends Channel {
 interface Consume {
     channel?: Channel;
     rpcQueue: string;
-    onMassage: (message: ConsumeMessage | null) => void;
+    onMessage: (message: ConsumeMessage | null) => void;
 }
 declare class AmqpManager {
     private connect;
@@ -34,6 +34,7 @@ declare class AmqpManager {
     delConsume(rpcQueue: string): boolean;
     addConsume(consume: Consume, restore: boolean): Promise<void>;
     sendRPCMessage(rpcQueue: string, message: any, opt?: Options.Publish): Promise<boolean>;
+    getAmqpLibInstance(): Connection | null;
     private getChannel;
 }
 export default AmqpManager;

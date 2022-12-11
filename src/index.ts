@@ -18,7 +18,7 @@ export interface ChannelWithResponse extends Channel {
 interface Consume {
   channel?: Channel,
   rpcQueue: string,
-  onMassage: (message: ConsumeMessage | null) => void,
+  onMessage: (message: ConsumeMessage | null) => void,
 }
 
 class AmqpManager {
@@ -104,7 +104,7 @@ class AmqpManager {
     return this.connect != null;
   }
 
-  sendRPCMessageWithResponse(rpcQueue: string, message: any, timerError = 5000, opt?: Options.Publish): Promise<ConsumeMessage> {
+  public sendRPCMessageWithResponse(rpcQueue: string, message: any, timerError = 5000, opt?: Options.Publish): Promise<ConsumeMessage> {
     return new Promise(async (resolve, reject) => {
       const correlationId = uuidv4();
 
@@ -134,7 +134,7 @@ class AmqpManager {
   }
 
 
-  delConsume(rpcQueue: string): boolean {
+  public delConsume(rpcQueue: string): boolean {
     const consumer: Consume | undefined = this.listConsumes.get(rpcQueue);
     if (consumer) {
       consumer.channel?.close();
@@ -145,7 +145,7 @@ class AmqpManager {
     }
   }
 
-  async addConsume(consume: Consume, restore: boolean): Promise<void> {
+  public async addConsume(consume: Consume, restore: boolean): Promise<void> {
     if (this.listConsumes.get(consume.rpcQueue) && !restore)
       throw new Error('rpcQueue already subscribed');
 
@@ -153,12 +153,12 @@ class AmqpManager {
     if (channel) {
       consume.channel = channel;
       await channel.assertQueue(consume.rpcQueue, { durable: false });
-      await channel.consume(consume.rpcQueue, consume.onMassage, { noAck: true })
+      await channel.consume(consume.rpcQueue, consume.onMessage, { noAck: true })
     }
     this.listConsumes.get(consume.rpcQueue) == null && this.listConsumes.set(consume.rpcQueue, consume);
   }
 
-  async sendRPCMessage(rpcQueue: string, message: any, opt?: Options.Publish): Promise<boolean> {
+  public async sendRPCMessage(rpcQueue: string, message: any, opt?: Options.Publish): Promise<boolean> {
     const channel: Channel | null = await this.getChannel();
     if (channel) {
       const isSend = channel.sendToQueue(rpcQueue, Buffer.from(message), opt);
@@ -167,6 +167,10 @@ class AmqpManager {
     }else {
       return false;
     }
+  }
+
+  public getAmqpLibInstance(): Connection | null {
+    return this.connect;
   }
 
   private async getChannel(): Promise<Channel | null> {
