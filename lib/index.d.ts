@@ -32,7 +32,7 @@ declare class AmqpManager {
     isConnected(): boolean;
     sendRPCMessageWithResponse(rpcQueue: string, message: any, timerError?: number, opt?: Options.Publish): Promise<ConsumeMessage>;
     delConsume(rpcQueue: string): boolean;
-    addConsume(consume: Consume, restore: boolean): Promise<void>;
+    addConsume(consume: Consume, restore: boolean, opt?: Options.AssertQueue): Promise<void>;
     sendRPCMessage(rpcQueue: string, message: any, opt?: Options.Publish): Promise<boolean>;
     getAmqpLibInstance(): Connection | null;
     private getChannel;

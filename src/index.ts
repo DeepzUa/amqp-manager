@@ -145,14 +145,14 @@ class AmqpManager {
     }
   }
 
-  public async addConsume(consume: Consume, restore: boolean): Promise<void> {
+  public async addConsume(consume: Consume, restore: boolean, opt?: Options.AssertQueue): Promise<void> {
     if (this.listConsumes.get(consume.rpcQueue) && !restore)
       throw new Error('rpcQueue already subscribed');
 
     const channel = await this.getChannel();
     if (channel) {
       consume.channel = channel;
-      await channel.assertQueue(consume.rpcQueue, { durable: false });
+      await channel.assertQueue(consume.rpcQueue, { durable: false, ...opt });
       await channel.consume(consume.rpcQueue, consume.onMessage, { noAck: true })
     }
     this.listConsumes.get(consume.rpcQueue) == null && this.listConsumes.set(consume.rpcQueue, consume);
