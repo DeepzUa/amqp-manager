@@ -17,7 +17,7 @@
     "rpc"
   ],
   "devDependencies": {
-    "@types/amqplib": "0.8.2",
+    "@types/amqplib": "0.10.1",
     "@types/node": "18.7.9",
     "@types/uuid": "8.3.4",
     "typescript": "4.7.4"
